@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>{{course.name}}</h3>
+Course offered by Professor <span style="color:orange">{{course.professor.first_name}}&nbsp{{course.professor.last_name}}</span><br>
+<a href="{% url 'drop' pk=course.name %}"><button>Drop</button></a>
+{% endblock %}

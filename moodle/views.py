@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Course
 from django.views import generic
 from django.shortcuts import get_object_or_404
@@ -24,4 +24,27 @@ def allcourses(request):
 def courseDetail(request,pk):
 	course = get_object_or_404(Course,pk=pk)
 	
-	return render(request, course_enrolled.html,context={'course':course})
+	if course.student.filter(username=request.user.username).exists():
+
+		return render(request, 'course_enrolled.html',context={'course':course})
+	
+	else:
+		return render(request, 'course_to_enroll.html', context ={'course':course})
+			
+
+def courseEnroll(request,pk):
+	course = get_object_or_404(Course,pk=pk)
+	
+	course.student.add(request.user)
+	course.save()
+	
+	return redirect( 'course-detail', course.name)
+	
+	
+def courseDrop(request,pk):
+	course = get_object_or_404(Course,pk=pk)
+	
+	course.student.remove(request.user)
+	course.save()
+	
+	return redirect( 'course-detail', course.name)
