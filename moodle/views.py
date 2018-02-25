@@ -10,7 +10,7 @@ def home(request):
 
 def courses(request):
 	'''Page with all the courses in which student has enrolled'''
-	courses= Course.objects.filter(student__username='stud3')
+	courses= Course.objects.filter(student__username=request.user.username)
 	return render( request, 'courses.html' , context={'courses':courses} )
 	
 def allcourses(request):
