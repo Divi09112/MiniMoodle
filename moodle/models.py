@@ -10,3 +10,6 @@ class Course(models.Model):
 
 	def __str__(self):
 		return self.name
+	
+	def get_absolute_url(self):
+		return reverse('course-detail',args=[str(self.name)])
