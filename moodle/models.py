@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Course(models.Model):
 	"""Model representing a course"""
 	name = models.CharField(max_length=6,primary_key=True)
-	professor = models.CharField(User,null=False,max_length=100)
+	professor = models.OneToOneField(User,blank=False,null=False,on_delete=models.CASCADE,related_name="+")
 	student =models.ManyToManyField(User)
 
 	def __str__(self):
