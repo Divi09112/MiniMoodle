@@ -3,7 +3,7 @@
 {% if courses %}
 <ul>
 {% for course in courses %}
-<li><a href="{% url course.get_absolute_url %}">{{course.name}}</a></li>
+<li><a href="{{ course.get_absolute_url }}">{{course.name}}</a></li>
 {% endfor %}
 </ul>
 {% else %}

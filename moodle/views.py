@@ -24,5 +24,4 @@ def allcourses(request):
 def courseDetail(request,pk):
 	course = get_object_or_404(Course,pk=pk)
 	
-	if course.student_set.filter(student=request.user.username).exists():
-		return render(request, course_enrolled.html,context={'course':course})
+	return render(request, course_enrolled.html,context={'course':course})
