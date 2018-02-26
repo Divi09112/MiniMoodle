@@ -7,7 +7,7 @@ from django.urls import reverse
 class Course(models.Model):
 	"""Model representing a course"""
 	name = models.CharField(max_length=6,primary_key=True)
-	professor = models.OneToOneField(User,blank=False,null=False,on_delete=models.CASCADE,related_name="+")
+	professor = models.OneToOneField(User,blank=False,null=False,on_delete=models.CASCADE,related_name="courses")
 	student =models.ManyToManyField(User,null=True,blank=True)
 
 	def __str__(self):

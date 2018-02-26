@@ -1,25 +1,26 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Course
-from django.views import generic
-from django.shortcuts import get_object_or_404
+from . import forms
 
 # Create your views here.
 
 def home(request):
 	'''Home page'''
-	group=request.session.get('group',request.user.groups.all()[0])
-	return render(request,'home.html',context={'courses':courses,'group':group})
+	student=request.user.groups.filter(name='Student').exists()
+	return render(request,'home.html',context={'courses':courses,'student':student})
 
 
 def courses(request):
 	'''Page with all the courses in which student has enrolled'''
+	group=request.session.get('group',request.user.groups.all()[0])
 	courses= Course.objects.filter(student__username=request.user.username)
-	return render( request, 'courses.html' , context={'courses':courses,'group':request.session['group']} )
+	return render( request, 'courses.html' , context={'courses':courses,'group':group} )
 	
 	
 def allcourses(request):
+	group=request.session.get('group',request.user.groups.all()[0])
 	courses=Course.objects.all()
-	return render(request, 'allcourses.html',context={'courses':courses})
+	return render(request, 'allcourses.html',context={'courses':courses,'group':group})
 	
 	
 def courseDetail(request,pk):
@@ -52,3 +53,18 @@ def courseDrop(request,pk):
 	course.save()
 	
 	return redirect( 'course-detail', course.name)
+	
+	
+def newCourse(request):
+	if request.method=='POST':
+		form=forms.NewCourse(request.POST)
+		if form.is_valid():
+			name=request.POST.get('name')
+			
+			course=Course(name=name,professor=request.user)
+			course.save()
+			
+			return redirect('course-detail',course.name)
+	else:
+		form=forms.NewCourse()	
+	return render( request, 'new_course.html',context={'form':form})

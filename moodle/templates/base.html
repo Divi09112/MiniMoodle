@@ -12,7 +12,11 @@
 					{% block sidebar %}
 					<ul class ="sidebar-nav">
 						<li><a href="{% url 'home' %}"> Home</a>
+						{% if student %}
 						<li><a href="{% url 'courses' %}">Courses Taken</a>
+						{% else %}
+						<li><a href="{% url 'new-course' %}">Float Course</a>
+						{% endif %}
 						<li><a href="{% url 'allcourses' %}">All Courses</a>
 					</ul>
 					<br><br>
