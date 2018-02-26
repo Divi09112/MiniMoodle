@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Course
+from .models import Course,Message
 from . import forms
 from django.contrib.auth.decorators import login_required, user_passes_test
 
@@ -43,8 +43,8 @@ def courseDetail(request,pk):
 	course = get_object_or_404(Course,pk=pk)
 	
 	if request.user in course.student.all():
-
-		return render(request, 'course_enrolled.html',context = {'course':course,'student':student(request)})
+		messages= Message.objects.filter(course=course)
+		return render(request, 'course_enrolled.html',context = {'course':course,'student':student(request),'messages':messages})
 	
 	else:
 		return render(request, 'course_to_enroll.html', context = {'course':course,'students':course.student.all().count(),'student':student(request)})

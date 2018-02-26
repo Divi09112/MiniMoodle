@@ -17,7 +17,7 @@ class Course(models.Model):
 	def get_absolute_url(self):
 		return reverse('course-detail',args=[str(self.name)])
 
-class Messages(models.Model):
+class Message(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4,)
 	title=models.CharField(max_length=100,blank=False)
 	content=models.CharField(max_length=500,blank=False)
