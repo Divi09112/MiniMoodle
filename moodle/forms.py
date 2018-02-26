@@ -5,6 +5,6 @@ class NewCourse(forms.Form):
 	
 
 class NewPost(forms.Form):
-	title=forms.CharField(max_length=100,required=True,widget=forms.TextInput(attrs={ 'placeholder':'title'}))
-	content=forms.CharField(max_length =500, required =True, widget=forms.TextInput(attrs={ 'placeholder':'post'}))
+	title=forms.CharField(max_length=100,required=True,label='',widget=forms.TextInput(attrs={ 'placeholder':'Title','style':'width:100%;max-width:400px'}))
+	content=forms.CharField(max_length =500, required =True,label='' ,widget=forms.Textarea(attrs={ 'placeholder':'Post', 'style':'resize:none;height:150px;width:100%;max-width:400px'}))
 	 

@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Course,Message
-from . import forms
+from .forms import NewCourse, NewPost
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User
+from datetime import datetime
 
 # Create your views here.
 
@@ -41,14 +43,28 @@ def allcourses(request):
 @login_required	
 def courseDetail(request,pk):
 	course = get_object_or_404(Course,pk=pk)
-	
-	if request.user in course.student.all():
-		messages= Message.objects.filter(course=course)
-		return render(request, 'course_enrolled.html',context = {'course':course,'student':student(request),'messages':messages})
+	messages= Message.objects.filter(course=course)
+	if 'Student' == request.user.groups.all()[0].name:
+		return render(request, 'course_student.html',context = {'course':course,'enrolled':request.user in course.student.all(),'messages':messages,})
 	
 	else:
-		return render(request, 'course_to_enroll.html', context = {'course':course,'students':course.student.all().count(),'student':student(request)})
-			
+		if request.user == course.professor:
+			if request.method=="POST":
+				form=NewPost(request.POST)
+				if form.is_valid():
+					title=form.cleaned_data['title']
+					content=form.cleaned_data['content']
+					message=Message(title=title,content=content,course=request.user.courses)
+					message.save()
+					form=NewPost()
+					return render(request, 'course_professor.html',context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor})
+			else:
+				form = NewPost()
+			return render(request,'course_professor.html', context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor})
+		else:
+			return render(request , 'course_professor.html',context={'course':course})
+		
+				
 
 @login_required
 @user_passes_test(is_student,'home','')
@@ -84,7 +100,7 @@ def courseDelete(request,pk):
 @user_passes_test(is_professor,'home','')
 def newCourse(request):
 	if request.method=='POST':
-		form=forms.NewCourse(request.POST)
+		form=NewCourse(request.POST)
 		if form.is_valid():
 			name=request.POST.get('name')
 			
@@ -93,5 +109,5 @@ def newCourse(request):
 			
 			return redirect('course-detail',course.name)
 	else:
-		form=forms.NewCourse()	
+		form=NewCourse()	
 	return render( request, 'new_course.html',context = {'form':form,'student':student(request)})

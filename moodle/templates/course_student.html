@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>{{course.name}}</h3>
+Course offered by Professor <span style="color:orange">{{course.professor.first_name}}&nbsp{{course.professor.last_name}}</span><br>
+Students enrolled: {{students}}<br>
+{% if enrolled %}
+<a href="{% url 'drop' pk=course.name %}"><button>Drop</button></a><br><br>
+{% else %}
+<a href="{% url 'enroll' pk=course.name %}"><button>Enroll</button></a><br><br>
+{% endif %}
+{% if messages %}
+	<div class= "container-fluid" >
+		{% for message in messages %}
+		<div class="row">
+			<div class="col-sm-5">
+			<h5>{{message.title}}</h5>
+			</div>
+			<div class ="row-sm-7">
+			{{message.timestamp}}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-7" >{{message.content}}
+			<hr style="display:block"></hr>
+			</div>
+		</div>
+		
+		{% endfor %}
+	</div>
+{% endif %}
+{% endblock %}
