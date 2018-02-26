@@ -4,23 +4,26 @@ from . import forms
 
 # Create your views here.
 
+def student(request):
+	return request.user.groups.filter(name='Student').exists()
+	
+	
 def home(request):
 	'''Home page'''
-	student=request.user.groups.filter(name='Student').exists()
-	return render(request,'home.html',context={'courses':courses,'student':student})
+	
+	return render(request,'home.html',context={'courses':courses,'student':student(request)})
 
 
 def courses(request):
 	'''Page with all the courses in which student has enrolled'''
-	group=request.session.get('group',request.user.groups.all()[0])
+	
 	courses= Course.objects.filter(student__username=request.user.username)
-	return render( request, 'courses.html' , context={'courses':courses,'group':group} )
+	return render( request, 'courses.html' , context={'courses':courses,'student':student(request)} )
 	
 	
 def allcourses(request):
-	group=request.session.get('group',request.user.groups.all()[0])
 	courses=Course.objects.all()
-	return render(request, 'allcourses.html',context={'courses':courses,'group':group})
+	return render(request, 'allcourses.html',context={'courses':courses,'student':student(request)})
 	
 	
 def courseDetail(request,pk):
@@ -28,13 +31,10 @@ def courseDetail(request,pk):
 	
 	if request.user in course.student.all():
 
-		return render(request, 'course_enrolled.html',context={'course':course})
+		return render(request, 'course_enrolled.html',context={'course':course,'student':student(request)})
 	
 	else:
-		students=0
-		for student in course.student.all():
-			students+=1 
-		return render(request, 'course_to_enroll.html', context ={'course':course,'students':students})
+		return render(request, 'course_to_enroll.html', context ={'course':course,'students':course.student.all().count(),'student':student(request)})
 			
 
 def courseEnroll(request,pk):
@@ -55,6 +55,12 @@ def courseDrop(request,pk):
 	return redirect( 'course-detail', course.name)
 	
 	
+def courseDelete(request,pk):
+	course=get_object_or_404(Course,pk=pk)
+	course.delete()
+	
+	return redirect('new-course')
+	
 def newCourse(request):
 	if request.method=='POST':
 		form=forms.NewCourse(request.POST)
@@ -67,4 +73,4 @@ def newCourse(request):
 			return redirect('course-detail',course.name)
 	else:
 		form=forms.NewCourse()	
-	return render( request, 'new_course.html',context={'form':form})
+	return render( request, 'new_course.html',context={'form':form,'student':student(request)})

@@ -1,9 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
-
+{% if user.courses %}
+<p>
+You have already floated course <span style="color:orange">{{user.courses}}</span>.
+</p>
+<p>
+If you want to float another course you have to <a href="{% url 'delete' user.courses%}"><span style="color:red"> delete</span></a> the existing course.
+</p> 
+{% else %}
 <form method='POST'>
 {% csrf_token %}
 {{form.as_p}}
 <input type="submit" value="Float">
 </form>
+{% endif %}
 {% endblock %} 
