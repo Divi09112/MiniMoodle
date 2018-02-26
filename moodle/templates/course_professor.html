@@ -30,6 +30,9 @@
 			<div class="col-sm-7" >{{message.content}}
 			<hr style="display:block"></hr>
 			</div>
+			<div class="col-sm-1">
+				<a href="{% url 'msg-delete' message.id %}"><button>Remove</button></a>
+			</div>
 		</div>
 		
 		{% endfor %}

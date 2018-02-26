@@ -111,3 +111,11 @@ def newCourse(request):
 	else:
 		form=NewCourse()	
 	return render( request, 'new_course.html',context = {'form':form,'student':student(request)})
+	
+
+@user_passes_test(is_professor,'home','')
+def msgDelete(request,pk):
+	message=get_object_or_404(Message,pk=pk)
+	message.delete()
+	
+	return redirect('course-detail',request.user.courses)
