@@ -45,7 +45,7 @@ def courseDetail(request,pk):
 	course = get_object_or_404(Course,pk=pk)
 	messages= Message.objects.filter(course=course)
 	if 'Student' == request.user.groups.all()[0].name:
-		return render(request, 'course_student.html',context = {'course':course,'enrolled':request.user in course.student.all(),'messages':messages,})
+		return render(request, 'course_student.html',context = {'course':course,'enrolled':request.user in course.student.all(),'messages':messages,'student':student(request)})
 	
 	else:
 		if request.user == course.professor:

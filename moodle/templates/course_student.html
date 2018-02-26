@@ -2,13 +2,11 @@
 {% block content %}
 <h3>{{course.name}}</h3>
 Course offered by Professor <span style="color:orange">{{course.professor.first_name}}&nbsp{{course.professor.last_name}}</span><br>
-Students enrolled: {{students}}<br>
+Students enrolled: {{course.student.all.count}}<br>
 {% if enrolled %}
 <a href="{% url 'drop' pk=course.name %}"><button>Drop</button></a><br><br>
-{% else %}
-<a href="{% url 'enroll' pk=course.name %}"><button>Enroll</button></a><br><br>
-{% endif %}
 {% if messages %}
+	<h5><strong>Posts from professor</strong></h5>	
 	<div class= "container-fluid" >
 		{% for message in messages %}
 		<div class="row">
@@ -27,5 +25,8 @@ Students enrolled: {{students}}<br>
 		
 		{% endfor %}
 	</div>
+{% endif %}
+{% else %}
+<a href="{% url 'enroll' pk=course.name %}"><button>Enroll</button></a><br><br>
 {% endif %}
 {% endblock %}
