@@ -7,13 +7,14 @@ from django.shortcuts import get_object_or_404
 
 def home(request):
 	'''Home page'''
-	return render(request,'home.html',context={'courses':courses})
+	group=request.session.get('group',request.user.groups.all()[0])
+	return render(request,'home.html',context={'courses':courses,'group':group})
 
 
 def courses(request):
 	'''Page with all the courses in which student has enrolled'''
 	courses= Course.objects.filter(student__username=request.user.username)
-	return render( request, 'courses.html' , context={'courses':courses} )
+	return render( request, 'courses.html' , context={'courses':courses,'group':request.session['group']} )
 	
 	
 def allcourses(request):
