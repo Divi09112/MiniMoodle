@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Course
 from . import forms
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 # Create your views here.
 
@@ -10,14 +10,21 @@ from django.contrib.auth.decorators import login_required
 def student(request):
 	return request.user.groups.filter(name='Student').exists()
 	
-	
+
+def is_professor(user):
+	return 'Professor' == user.groups.all()[0].name
+
+def is_student(user):
+	return 'Student' == user.groups.all()[0].name
+
 @login_required
 def home(request):
 	'''Home page'''
-	return render( request, 'home.html' , context = { 'courses':courses , 'student':student(request) })
+	return render( request, 'home.html' , context = { 'courses':courses , 'student':student(request),})
 
 
 @login_required
+@user_passes_test(is_student,'home','')
 def courses(request):
 	'''Page with all the courses in which student has enrolled'''
 	
@@ -44,6 +51,7 @@ def courseDetail(request,pk):
 			
 
 @login_required
+@user_passes_test(is_student,'home','')
 def courseEnroll(request,pk):
 	course = get_object_or_404(Course,pk=pk)
 	
@@ -54,6 +62,7 @@ def courseEnroll(request,pk):
 	
 
 @login_required	
+@user_passes_test(is_student,'home','')
 def courseDrop(request,pk):
 	course = get_object_or_404(Course,pk=pk)
 	
@@ -61,9 +70,9 @@ def courseDrop(request,pk):
 	course.save()
 	
 	return redirect( 'course-detail', course.name)
-	
 
 @login_required	
+@user_passes_test(is_professor,'home','')
 def courseDelete(request,pk):
 	course=get_object_or_404(Course,pk=pk)
 	course.delete()
@@ -72,6 +81,7 @@ def courseDelete(request,pk):
 
 
 @login_required
+@user_passes_test(is_professor,'home','')
 def newCourse(request):
 	if request.method=='POST':
 		form=forms.NewCourse(request.POST)
