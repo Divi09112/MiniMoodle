@@ -2,5 +2,6 @@
 {% block content %}
 <h3>{{course.name}}</h3>
 Course offered by <span style="color:orange">{{course.professor.first_name}}&nbsp{{course.professor.last_name}}</span><br>
+Students enrolled: {{students}}<br>
 <a href="{% url 'enroll' pk=course.name %}"><button>Enroll</button></a>
 {% endblock %}

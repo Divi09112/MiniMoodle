@@ -29,7 +29,10 @@ def courseDetail(request,pk):
 		return render(request, 'course_enrolled.html',context={'course':course})
 	
 	else:
-		return render(request, 'course_to_enroll.html', context ={'course':course})
+		students=0
+		for student in course.student.all():
+			students+=1 
+		return render(request, 'course_to_enroll.html', context ={'course':course,'students':students})
 			
 
 def courseEnroll(request,pk):
