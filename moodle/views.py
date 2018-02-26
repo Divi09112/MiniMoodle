@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Course,Message
+from .models import Course,Message,EnrollTime
 from .forms import NewCourse, NewPost
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
@@ -45,7 +45,12 @@ def courseDetail(request,pk):
 	course = get_object_or_404(Course,pk=pk)
 	messages= Message.objects.filter(course=course)
 	if 'Student' == request.user.groups.all()[0].name:
-		return render(request, 'course_student.html',context = {'course':course,'enrolled':request.user in course.student.all(),'messages':messages,'student':student(request)})
+		if request.user in course.student.all():
+			enrollt=EnrollTime.objects.filter(relcourse=course).filter(stud=request.user)[0].enrolltime
+		else:
+			enrollt=datetime.now()
+		msg_stud=Message.objects.filter(course=course).filter(timestamp__gt=enrollt)
+		return render(request, 'course_student.html',context = {'course':course,'enrolled':request.user in course.student.all(),'messages':msg_stud,'student':student(request),})
 	
 	else:
 		if request.user == course.professor:
@@ -74,6 +79,8 @@ def courseEnroll(request,pk):
 	course.student.add(request.user)
 	course.save()
 	
+	time=EnrollTime(stud=request.user,relcourse=course)
+	time.save()
 	return redirect( 'course-detail', course.name)
 	
 
@@ -84,7 +91,8 @@ def courseDrop(request,pk):
 	
 	course.student.remove(request.user)
 	course.save()
-	
+	time=EnrollTime.objects.filter(relcourse=course).filter(stud=request.user)[0]
+	time.delete()
 	return redirect( 'course-detail', course.name)
 
 @login_required	

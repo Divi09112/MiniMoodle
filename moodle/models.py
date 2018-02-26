@@ -32,4 +32,4 @@ class EnrollTime(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 	enrolltime=models.DateTimeField(auto_now=True)
 	stud= models.ForeignKey(User,on_delete=models.CASCADE,blank=False,null =False)
-	relcourse=models.ManyToManyField(Course,blank=False, null = False)
+	relcourse=models.ForeignKey(Course,on_delete=models.CASCADE,blank=False, null = False)
