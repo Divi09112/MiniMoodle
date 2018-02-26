@@ -3,5 +3,7 @@
 <h3>{{course.name}}</h3>
 Course offered by Professor <span style="color:orange">{{course.professor.first_name}}&nbsp{{course.professor.last_name}}</span><br>
 Students enrolled: {{students}}<br>
+{% if student %}
 <a href="{% url 'enroll' pk=course.name %}"><button>Enroll</button></a>
+{% endif %}
 {% endblock %}
