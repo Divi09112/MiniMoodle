@@ -1,16 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Course,Message,EnrollTime
-from .forms import NewCourse, NewPost
+from .forms import NewCourse, NewPost, NewUser
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,Group
 from datetime import datetime
 
 # Create your views here.
 
 
 '''Not views, just helper functions'''
-def student(request):
-	return request.user.groups.filter(name='Student').exists()
+def group(name,request):
+	return request.user.groups.filter(name=name).exists()
 	
 
 def is_professor(user):
@@ -18,6 +18,9 @@ def is_professor(user):
 
 def is_student(user):
 	return 'Student' == user.groups.all()[0].name
+	
+def is_admin(user):
+	return 'admin'== user.username
 	
 	
 	
@@ -30,7 +33,7 @@ def home(request):
 	return render( 
 		request, 'home.html' , 
 		context = { 'courses':courses , 
-		'student':student(request),}
+		'student':group('Student',request),'professor':group('Professor',request)}
 	)
 
 
@@ -43,7 +46,7 @@ def courses(request):
 	return render( 
 		request, 
 		'courses.html' , 
-		context = {'courses':courses,'student':student(request)} 
+		context = {'courses':courses,'student':group('Student',request)} 
 	)
 	
 
@@ -53,7 +56,7 @@ def allcourses(request):
 	return render(
 		request, 
 		'allcourses.html',
-		context = {'courses':courses,'student':student(request)}
+		context = {'courses':courses,'student':group('Student',request),'professor':group('Professor',request)}
 	)
 	
 
@@ -64,7 +67,7 @@ def courseDetail(request,pk):
 	
 	full =(course.student.all().count()==course.limit)
 	#If the user is a student
-	if 'Student' == request.user.groups.all()[0].name:
+	if request.user.groups.all()  and 'Student' == request.user.groups.all()[0].name:
 	
 		enrolled=request.user in course.student.all()
 		#getting enroll time for the student if he is enrolled in the course
@@ -79,7 +82,7 @@ def courseDetail(request,pk):
 		return render(
 			request, 
 			'course_student.html',
-			context = {'course':course,'enrolled':enrolled,'messages':msg_stud,'student':student(request),'full':full}
+			context = {'course':course,'enrolled':enrolled,'messages':msg_stud,'student':group('Student',request),'full':full}
 		)
 	
 	#If the user is professor
@@ -188,7 +191,7 @@ def newCourse(request):
 	return render( 
 		request, 
 		'new_course.html',
-		context = {'form':form,'student':student(request)}
+		context = {'form':form}
 	)
 	
 
@@ -202,3 +205,35 @@ def msgDelete(request,pk):
 		'course-detail',
 		request.user.courses
 	)
+	
+	
+	
+#view for admin to create new user
+def newUser(request):
+	if request.method=="POST":
+		form=NewUser(request.POST)
+		if form.is_valid():
+			user=form.save()
+			user.refresh_from_db()
+			group=Group.objects.get(name=form.cleaned_data.get('group'))
+			fname=form.cleaned_data.get('fname')
+			lname=form.cleaned_data.get('lname')
+			
+			user.first_name=fname
+			user.last_name=lname
+			group.user_set.add(user)
+			user.save()
+			return redirect(
+				'home'
+				)
+		else:
+			return redirect(
+				'new-user'
+				)
+	else:
+		form=NewUser()
+		return render( 
+			request,
+			'new_user.html',
+			context={'form':form}
+			)

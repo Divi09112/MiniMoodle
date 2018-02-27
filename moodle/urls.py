@@ -11,5 +11,6 @@ urlpatterns = [
 	url(r'^courses/(?P<pk>\w+)/delete/$',views.courseDelete,name='delete'),
 	path('newcourse/',views.newCourse,name='new-course'),
 	url(r'^message/(?P<pk>[-\w]+)/delete/$',views.msgDelete,name='msg-delete'),
+	path('newuser/',views.newUser,name='new-user'),
 	path('allcourses/',views.allcourses,name='allcourses'),
 ]

@@ -14,8 +14,10 @@
 						<li><a href="{% url 'home' %}"> Home</a>
 						{% if student %}
 						<li><a href="{% url 'courses' %}">Courses Taken</a>
-						{% else %}
+						{% elif professor %}
 						<li><a href="{% url 'new-course' %}">Float Course</a>
+						{% else %}
+						<li><a href ="{% url 'new-user' %}">New User</a>
 						{% endif %}
 						<li><a href="{% url 'allcourses' %}">All Courses</a>
 					</ul>

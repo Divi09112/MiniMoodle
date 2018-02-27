@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+{{form.non_field_errors.as_text}}
+{{form.username.errors.as_text}}
+{{form.password1.errors.as_text}}
+{{form.password2.errors.as_text}}
+<div class = "container-fluid">
+	<form method="Post">
+	{% csrf_token %}
+	<div class="row">
+		<div class="col-sm-2">
+			Username:<br>
+		</div>
+		<div class="col-sm-2">
+			{{ form.username }}<br>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-2">
+			First Name:<br>
+		</div>
+		<div class="col-sm-2">
+			{{ form.fname }}<br>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-2">
+			Last Name:<br>
+		</div>
+		<div class="col-sm-2">
+			{{ form.lname }}<br>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-2">
+			Password:<br>
+		</div>
+		<div class="col-sm-2">
+			{{ form.password1 }}<br>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-2">
+			Confirm Password:<br>
+		</div>
+		<div class="col-sm-2">
+			{{ form.password2 }}<br>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-2">
+			Group:<br>
+		</div>
+		<div class="col-sm-2">
+			{{ form.group }}<br>
+		</div>
+	</div>
+	<input type="submit" value="Create">
+</form>
+</div>
+{% endblock %}
