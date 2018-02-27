@@ -8,7 +8,7 @@ from datetime import datetime
 # Create your views here.
 
 
-'''Not a view, just a helper function'''
+'''Not views, just helper functions'''
 def student(request):
 	return request.user.groups.filter(name='Student').exists()
 	
@@ -18,11 +18,20 @@ def is_professor(user):
 
 def is_student(user):
 	return 'Student' == user.groups.all()[0].name
+	
+	
+	
+'''Views'''
 
+	
 @login_required
 def home(request):
 	'''Home page'''
-	return render( request, 'home.html' , context = { 'courses':courses , 'student':student(request),})
+	return render( 
+		request, 'home.html' , 
+		context = { 'courses':courses , 
+		'student':student(request),}
+	)
 
 
 @login_required
@@ -31,46 +40,91 @@ def courses(request):
 	'''Page with all the courses in which student has enrolled'''
 	
 	courses= Course.objects.filter(student__username=request.user.username)
-	return render( request, 'courses.html' , context = {'courses':courses,'student':student(request)} )
+	return render( 
+		request, 
+		'courses.html' , 
+		context = {'courses':courses,'student':student(request)} 
+	)
 	
 
 @login_required	
 def allcourses(request):
 	courses=Course.objects.all()
-	return render(request, 'allcourses.html',context = {'courses':courses,'student':student(request)})
+	return render(
+		request, 
+		'allcourses.html',
+		context = {'courses':courses,'student':student(request)}
+	)
 	
 
 @login_required	
 def courseDetail(request,pk):
 	course = get_object_or_404(Course,pk=pk)
 	messages= Message.objects.filter(course=course)
+	
+	full =(course.student.all().count()==course.limit)
+	#If the user is a student
 	if 'Student' == request.user.groups.all()[0].name:
-		if request.user in course.student.all():
+	
+		enrolled=request.user in course.student.all()
+		#getting enroll time for the student if he is enrolled in the course
+		if enrolled:
 			enrollt=EnrollTime.objects.filter(relcourse=course).filter(stud=request.user)[0].enrolltime
 		else:
 			enrollt=datetime.now()
+			
+		#This queryset contains messages only after the enrollement time
 		msg_stud=Message.objects.filter(course=course).filter(timestamp__gt=enrollt)
-		return render(request, 'course_student.html',context = {'course':course,'enrolled':request.user in course.student.all(),'messages':msg_stud,'student':student(request),})
+		
+		return render(
+			request, 
+			'course_student.html',
+			context = {'course':course,'enrolled':enrolled,'messages':msg_stud,'student':student(request),'full':full}
+		)
 	
+	#If the user is professor
 	else:
+	
+		#If he is the course professor
 		if request.user == course.professor:
+		
 			if request.method=="POST":
 				form=NewPost(request.POST)
+		
 				if form.is_valid():
 					title=form.cleaned_data['title']
 					content=form.cleaned_data['content']
+					
 					message=Message(title=title,content=content,course=request.user.courses)
 					message.save()
+					
 					form=NewPost()
-					return render(request, 'course_professor.html',context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor})
+					
+					return render(
+						request, 
+						'course_professor.html',
+						context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor}
+					)
+					
 			else:
 				form = NewPost()
-			return render(request,'course_professor.html', context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor})
+
+			return render(
+				request,
+				'course_professor.html',
+				 context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor}
+			)
+			
+		# If he is not the course professor
 		else:
-			return render(request , 'course_professor.html',context={'course':course})
+			return render(
+				request , 
+				'course_professor.html',
+				context={'course':course}
+			)
 		
 				
-
+#proxy view for enrolling into a course
 @login_required
 @user_passes_test(is_student,'home','')
 def courseEnroll(request,pk):
@@ -84,6 +138,7 @@ def courseEnroll(request,pk):
 	return redirect( 'course-detail', course.name)
 	
 
+#proxy view for dropping out of a courses
 @login_required	
 @user_passes_test(is_student,'home','')
 def courseDrop(request,pk):
@@ -91,10 +146,14 @@ def courseDrop(request,pk):
 	
 	course.student.remove(request.user)
 	course.save()
+	
 	time=EnrollTime.objects.filter(relcourse=course).filter(stud=request.user)[0]
 	time.delete()
+	
 	return redirect( 'course-detail', course.name)
 
+
+#proxy view for deleting a course
 @login_required	
 @user_passes_test(is_professor,'home','')
 def courseDelete(request,pk):
@@ -104,26 +163,42 @@ def courseDelete(request,pk):
 	return redirect('new-course')
 
 
+
 @login_required
 @user_passes_test(is_professor,'home','')
 def newCourse(request):
+
 	if request.method=='POST':
 		form=NewCourse(request.POST)
+	
 		if form.is_valid():
 			name=request.POST.get('name')
+			limit=request.POST.get('limit')
 			
-			course=Course(name=name,professor=request.user)
+			course=Course(name=name,professor=request.user,limit=limit)
 			course.save()
 			
-			return redirect('course-detail',course.name)
+			return redirect(
+				'course-detail',
+				course.name
+			)
 	else:
 		form=NewCourse()	
-	return render( request, 'new_course.html',context = {'form':form,'student':student(request)})
+	
+	return render( 
+		request, 
+		'new_course.html',
+		context = {'form':form,'student':student(request)}
+	)
 	
 
+#proxy view for deleting a message
 @user_passes_test(is_professor,'home','')
 def msgDelete(request,pk):
 	message=get_object_or_404(Message,pk=pk)
 	message.delete()
 	
-	return redirect('course-detail',request.user.courses)
+	return redirect(
+		'course-detail',
+		request.user.courses
+	)
