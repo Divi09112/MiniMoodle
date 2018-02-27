@@ -9,7 +9,8 @@ class Course(models.Model):
 	"""Model representing a course"""
 	name = models.CharField(max_length=6,primary_key=True)
 	professor = models.OneToOneField(User,blank=False,null=False,on_delete=models.CASCADE,related_name="courses")
-	student =models.ManyToManyField(User,null=True,blank=True)
+	student =models.ManyToManyField(User,blank=True)
+	limit = models.PositiveIntegerField(blank=False)
 
 	def __str__(self):
 		return self.name
