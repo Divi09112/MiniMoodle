@@ -209,6 +209,7 @@ def msgDelete(request,pk):
 	
 	
 #view for admin to create new user
+@user_passes_test(is_admin,'home','')
 def newUser(request):
 	if request.method=="POST":
 		form=NewUser(request.POST)
