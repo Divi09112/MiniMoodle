@@ -35,6 +35,12 @@ wheels/
 pip-log.txt
 pip-delete-this-directory.txt
 
+# Text backup files
+*.bak
+
+#Database
+*.sqlite3
+
 # Unit test / coverage reports
 htmlcov/
 .tox/
