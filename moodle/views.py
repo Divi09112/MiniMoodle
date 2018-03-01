@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect,reverse, get_object_or_404
 from .models import Course,Message,EnrollTime
 from .forms import NewCourse, NewPost, NewUser
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User,Group
-from datetime import datetime
-
+from datetime import datetime,timedelta
+from django.contrib import messages
 # Create your views here.
 
 
@@ -30,10 +30,12 @@ def is_admin(user):
 @login_required
 def home(request):
 	'''Home page'''
+
+	messages= Message.objects.exclude(timestamp__lt=(datetime.now()-timedelta(days=1)))
 	return render( 
 		request, 'home.html' , 
 		context = { 'courses':courses , 
-		'student':group('Student',request),'professor':group('Professor',request)}
+		'student':group('Student',request),'professor':group('Professor',request),'messages':messages}
 	)
 
 
@@ -103,11 +105,7 @@ def courseDetail(request,pk):
 					
 					form=NewPost()
 					
-					return render(
-						request, 
-						'course_professor.html',
-						context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor,'professor':True}
-					)
+					return redirect('course-detail',course.name)
 					
 			else:
 				form = NewPost()
@@ -122,8 +120,8 @@ def courseDetail(request,pk):
 		else:
 			return render(
 				request , 
-				'course_professor.html',
-				context={'course':course,'professor':True}
+				'course_professor.html',				
+				context={'course':course,'professor':True,}
 			)
 		
 				
@@ -161,10 +159,11 @@ def courseDrop(request,pk):
 @user_passes_test(is_professor,'home','')
 def courseDelete(request,pk):
 	course=get_object_or_404(Course,pk=pk)
-	course.delete()
-	
-	return redirect('new-course')
-
+	if course.professor==request.user:
+		course.delete()
+		return redirect('new-course')
+	else:
+		return redirect('home')
 
 
 @login_required
@@ -178,20 +177,24 @@ def newCourse(request):
 			name=request.POST.get('name')
 			limit=request.POST.get('limit')
 			
-			course=Course(name=name,professor=request.user,limit=limit)
-			course.save()
-			
-			return redirect(
-				'course-detail',
-				course.name
-			)
+			if Course.objects.filter(name=name).exists():
+				form=NewCourse()
+				return redirect('new-course')
+			else:
+				course=Course(name=name,professor=request.user,limit=limit)
+				course.save()
+
+				return redirect(
+					'course-detail',
+					course.name
+				)
 	else:
 		form=NewCourse()	
 	
 	return render( 
 		request, 
 		'new_course.html',
-		context = {'form':form}
+		context = {'form':form,'professor':True}
 	)
 	
 

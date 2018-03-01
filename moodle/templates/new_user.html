@@ -1,61 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
+<h3> New User</h3>
 {{form.non_field_errors.as_text}}
-{{form.username.errors.as_text}}
-{{form.password1.errors.as_text}}
-{{form.password2.errors.as_text}}
 <div class = "container-fluid">
 	<form method="Post">
+	{{form.non_field_errors}}
 	{% csrf_token %}
-	<div class="row">
-		<div class="col-sm-2">
-			Username:<br>
+	<div class="form-group">
+		{{ form.username.label}} <span style="color:red">{{form.username.errors.as_text}}</span><input type="text" name="username" class="form-control" placeholder="Enter a username" >
 		</div>
-		<div class="col-sm-2">
-			{{ form.username }}<br>
+		<div class="form-group">
+		Firstname <span style="color:red">{{form.fname.errors.as_text}}</span><input type="text" name="fname" class="form-control"  placeholder="Enter your first name" >
+		</div><div class="form-group">
+		Lastname <span style="color:red">{{form.lname.errors.as_text}}</span><input type="text" name="lname" class="form-control"  placeholder="Enter your last name" >
 		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-2">
-			First Name:<br>
+		<div class="form-group">
+		Password <span style="color:red">{{form.password.errors.as_text}}</span><br><input type="password" name="password" class="form-control"  placeholder="Enter a secure password" >
+		</div><div class="form-group">
+		Confirm password <span style="color:red">{{form.password1.errors.as_text}}</span><br><input type="password" name="password1" class="form-control" placeholder="Confirm password" >
 		</div>
-		<div class="col-sm-2">
-			{{ form.fname }}<br>
+		<div class="form-group">
+		{{ form.group.label}} <span style="color:red">{{form.group.errors.as_text}}</span>{{ form.group}}
 		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-2">
-			Last Name:<br>
-		</div>
-		<div class="col-sm-2">
-			{{ form.lname }}<br>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-2">
-			Password:<br>
-		</div>
-		<div class="col-sm-2">
-			{{ form.password1 }}<br>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-2">
-			Confirm Password:<br>
-		</div>
-		<div class="col-sm-2">
-			{{ form.password2 }}<br>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-sm-2">
-			Group:<br>
-		</div>
-		<div class="col-sm-2">
-			{{ form.group }}<br>
-		</div>
-	</div>
-	<input type="submit" value="Create">
+	<input type="submit" value="Create" class="btn btn-info">
 </form>
 </div>
 {% endblock %}

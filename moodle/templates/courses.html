@@ -2,9 +2,10 @@
 {% block content %}
 {% if student %}
 {% if courses %}
+<h4>My Courses</h4>
 <ul>
 {% for course in courses %}
-<li><a href="{{ course.get_absolute_url }}">{{course.name}}</a></li>
+<li style="display:block"><span class="glyphicon glyphicon-chevron-right"><a href="{{ course.get_absolute_url }}">{{course.name}}</a></span></li>
 {% endfor %}
 </ul>
 {% else %}
