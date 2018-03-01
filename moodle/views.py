@@ -31,11 +31,11 @@ def is_admin(user):
 def home(request):
 	'''Home page'''
 
-	messages= Message.objects.exclude(timestamp__lt=(datetime.now()-timedelta(days=1)))
+	posts= Message.objects.exclude(timestamp__lt=(datetime.now()-timedelta(days=1)))
 	return render( 
 		request, 'home.html' , 
 		context = { 'courses':courses , 
-		'student':group('Student',request),'professor':group('Professor',request),'messages':messages}
+		'student':group('Student',request),'professor':group('Professor',request),'posts':posts}
 	)
 
 
@@ -65,7 +65,7 @@ def allcourses(request):
 @login_required	
 def courseDetail(request,pk):
 	course = get_object_or_404(Course,pk=pk)
-	messages= Message.objects.filter(course=course)
+	posts= Message.objects.filter(course=course)
 	
 	full =(course.student.all().count()==course.limit)
 	#If the user is a student
@@ -84,7 +84,7 @@ def courseDetail(request,pk):
 		return render(
 			request, 
 			'course_student.html',
-			context = {'course':course,'enrolled':enrolled,'messages':msg_stud,'student':group('Student',request),'full':full}
+			context = {'course':course,'enrolled':enrolled,'posts':msg_stud,'student':group('Student',request),'full':full}
 		)
 	
 	#If the user is professor
@@ -113,7 +113,7 @@ def courseDetail(request,pk):
 			return render(
 				request,
 				'course_professor.html',
-				 context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor,'professor':True}
+				 context={'form':form,'posts':posts,'course':course,'check':request.user == course.professor,'professor':True}
 			)
 			
 		# If he is not the course professor
@@ -179,10 +179,13 @@ def newCourse(request):
 			
 			if Course.objects.filter(name=name).exists():
 				form=NewCourse()
+				course=Course.objects.filter(name=name)
+				messages.add_message(request,messages.ERROR, 'Course with this name has already been offered by'+course.professor.first_name+course.professor.last_name)
 				return redirect('new-course')
 			else:
 				course=Course(name=name,professor=request.user,limit=limit)
 				course.save()
+				messages.add_message(request,messages.INFO, 'Created a new course')
 
 				return redirect(
 					'course-detail',
@@ -217,22 +220,27 @@ def newUser(request):
 	if request.method=="POST":
 		form=NewUser(request.POST)
 		if form.is_valid():
-			user=form.save()
-			user.refresh_from_db()
-			group=Group.objects.get(name=form.cleaned_data.get('group'))
-			fname=form.cleaned_data.get('fname')
-			lname=form.cleaned_data.get('lname')
+			if not User.objects.filter(username=form.cleaned_data.get('username')).exists():
+				user=form.save()
+				user.refresh_from_db()
+				group=Group.objects.get(name=form.cleaned_data.get('group'))
+				fname=form.cleaned_data.get('fname')
+				lname=form.cleaned_data.get('lname')
+				user.first_name=fname
+				user.last_name=lname
+				group.user_set.add(user)
+				user.save()
+				messages.add_message(request,messages.INFO,'New User added')
+				return redirect(
+					'home'
+					)
 			
-			user.first_name=fname
-			user.last_name=lname
-			group.user_set.add(user)
-			user.save()
-			return redirect(
-				'home'
-				)
+			else:
+				return redirect('new-user')
 		else:
-			return redirect(
-				'new-user'
+			return render(request,
+				'new_user.html',
+				context={'form':form}
 				)
 	else:
 		form=NewUser()
