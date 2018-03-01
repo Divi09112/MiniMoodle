@@ -14,8 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.contrib.auth import views as auth_views
+from django.urls import path, include
+from django.views.generic import RedirectView
+
 
 urlpatterns = [
+	path('', RedirectView.as_view(url='/moodle/')),
+	path('moodle/', include('moodle.urls')),
+	path('login/', auth_views.login,name='login'),
+	path('logout/',auth_views.logout,{'next_page':'login'},name='logout'),
     path('admin/', admin.site.urls),
 ]
