@@ -12,7 +12,7 @@
 		</p> 
 	{% else %}
 		<h4> Float a New Course</h4><br>
-		<form method='POST'>		
+		<form method='Post'>		
 			{% csrf_token %}
 			<div class="form-group">
 			{{form.name.label}}: {{form.name}}

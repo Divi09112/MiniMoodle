@@ -7,20 +7,20 @@
 	{% if enrolled %}
 		<a href="{% url 'drop' pk=course.name %}"><button class="btn btn-info">Drop</button></a><br><br>
 		<h4><strong>Posts from professor</strong></h4>	
-		{% if messages %}
+		{% if posts %}
 			
 			<div class= "container-fluid" >
-				{% for message in messages %}
+				{% for post in posts %}
 					<div class="row">
 						<div class="col-sm-5">
-							<h5>{{message.title}}</h5>
+							<h5>{{post.title}}</h5>
 						</div>
 						<div class ="row-sm-7">
-							{{message.timestamp}}
+							{{post.timestamp}}
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-sm-7" >{{message.content}}
+						<div class="col-sm-7" >{{post.content}}
 							<hr style="display:block"></hr>
 						</div>
 					</div>

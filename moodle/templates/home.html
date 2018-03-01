@@ -10,16 +10,16 @@
 {% block sidefeed %}
 	{% if student %}
 		<strong>Recent posts</strong><br>
-		{% for message in messages%}
-			{%if message.course in user.course_set.all%}
+		{% for post in posts%}
+			{%if post.course in user.course_set.all%}
 				<div class="well">
 					<p><a href="{%url 'course-detail' message.course %}">{{message.course}}</a></p>
-					<strong>{{message.title}}</strong>
-					{% if message.content|make_list|length > 20 %}
-					{{message.content|make_list|slice:':18'|join:''}}...
-					{%else%}{{message.content}}
+					<strong>{{post.title}}</strong>
+					{% if post.content|make_list|length > 20 %}
+					{{post.content|make_list|slice:':18'|join:''}}...
+					{%else%}{{post.content}}
 					{%endif%}<br>
-					{{message.timestamp}}
+					{{post.timestamp}}
 				</div>
 			{% endif%}
 		{% endfor %}

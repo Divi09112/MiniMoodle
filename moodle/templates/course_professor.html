@@ -23,23 +23,23 @@ Maximum Strength: {{ course.limit }}<br>
 	</div>
 	<h4><strong>Earlier Posts</strong></h4>
 	<hr>
-	{% if messages %}
+	{% if posts %}
 	<div class= "container-fluid" >
-		{% for message in messages %}
+		{% for post in posts %}
 			<div class="row">
 				<div class="col-sm-12">
-					<h4>{{message.title}}</h4>
+					<h4>{{post.title}}</h4>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-8" >{{message.content}}<br>
+				<div class="col-sm-8" >{{post.content}}<br>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-8" >{{message.timestamp}}<br>
+				<div class="col-sm-8" >{{post.timestamp}}<br>
 				</div>
 				<div class="col-sm-1">
-					<a href="{% url 'msg-delete' message.id %}"><button class="btn btn-danger">Remove</button></a>
+					<a href="{% url 'msg-delete' post.id %}"><button class="btn btn-danger">Remove</button></a>
 				</div>
 			</div>
 			<hr>

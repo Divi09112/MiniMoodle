@@ -93,6 +93,13 @@
    	{% endif%}
     </div>
     <div class="col-sm-8 text-left">
+    	{% if messages%}
+    	{% for message in messages%}
+    	<div class="well">
+    	{{message}}
+    	</div>
+    	{% endfor %}
+    	{%endif%}
     	<p> 
       {% block content %}
       {% endblock %}
