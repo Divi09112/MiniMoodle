@@ -106,7 +106,7 @@ def courseDetail(request,pk):
 					return render(
 						request, 
 						'course_professor.html',
-						context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor}
+						context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor,'professor':True}
 					)
 					
 			else:
@@ -115,7 +115,7 @@ def courseDetail(request,pk):
 			return render(
 				request,
 				'course_professor.html',
-				 context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor}
+				 context={'form':form,'messages':messages,'course':course,'check':request.user == course.professor,'professor':True}
 			)
 			
 		# If he is not the course professor
@@ -123,7 +123,7 @@ def courseDetail(request,pk):
 			return render(
 				request , 
 				'course_professor.html',
-				context={'course':course}
+				context={'course':course,'professor':True}
 			)
 		
 				
